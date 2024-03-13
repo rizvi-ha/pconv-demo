@@ -23,3 +23,5 @@ yarn-debug.log*
 yarn-error.log*
 **/*.pth
 /backend/model/examples
+**/*.cpython
+**/*.pyc

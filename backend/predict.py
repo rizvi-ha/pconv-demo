@@ -6,10 +6,11 @@ from PIL import Image
 import torch
 import torch.nn.functional as F
 import torchvision.transforms.functional as TF
+import subprocess
 
 from src.model import PConvUNet
 
-def process_image(image_path, mask_path, model_path='pretrained_pconv.pth', resize=True, gpu_id=0):
+def process_image(image_path, mask_path, model_path='backend/pretrained_pconv.pth', resize=True, gpu_id=0):
     # Define the used device
     device = torch.device(f"cuda:{gpu_id}" if torch.cuda.is_available() else "cpu")
 
@@ -52,6 +53,10 @@ def process_image(image_path, mask_path, model_path='pretrained_pconv.pth', resi
     print("Saving the output...")
     out = TF.to_pil_image(out)
     img_name = image_path.split('/')[-1]
-    output_path = os.path.join("output", f"out_{img_name}")
+    if (os.path.isdir("backend/output")):
+        output_path = os.path.join("backend/output", f"out_{img_name}")
+    else:
+        subprocess.run('mkdir backend/output', shell=True)
+        output_path = os.path.join("backend/output", f"out_{img_name}")
     out.save(output_path)
     return output_path

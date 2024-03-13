@@ -10,8 +10,12 @@ app = Flask(__name__)
 CORS(app, resources={r"/upload": {"origins": "*"}})
 # This is the path to the directory where you want to save the uploaded files.
 # Make sure this directory exists and your application has write permissions.
-UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER = 'backend/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+if not (os.path.isdir('backend/uploads')):
+    subprocess.run('mkdir backend/uploads', shell=True)
+
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -38,8 +42,8 @@ def upload_file():
         # For example: process_images(original_path, mask_path)
         model_output = process_image(original_path, mask_path)
         encoded_image = encode_image_to_base64(model_output)
-        subprocess.run('rm /Users/isaacblender/Desktop/pconv_demo/backend/output/*', shell=True)
-        subprocess.run('rm /Users/isaacblender/Desktop/pconv_demo/backend/uploads/*', shell=True)
+        subprocess.run('rm backend/output/*', shell=True)
+        subprocess.run('rm backend/uploads/*', shell=True)
         return jsonify({'message': 'Files uploaded successfully', 'encoded_image': encoded_image}), 200
 
 def encode_image_to_base64(image_path):
