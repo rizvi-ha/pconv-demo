@@ -2,7 +2,7 @@
 
 ![](https://i.imgur.com/rk6r66m.gif)
 
-To try it out, clone and run:
+To try it out, clone, put [this file](https://drive.google.com/file/d/1sooo-BLSNRUGWG_AB-lxh7xHgJ2bS29a/view) in /backend/, and run:
 
 ### `pip install -r requirements.txt`
 ### `npm i`
