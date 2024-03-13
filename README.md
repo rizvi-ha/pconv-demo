@@ -2,6 +2,7 @@
 
 To try it out, clone and run:
 
+### `pip install -r requirements.txt`
 ### `npm i`
 ### `npm start`
 
