@@ -12,7 +12,7 @@ import subprocess
 from src.model2 import PConvUNet
 
 
-def process_image(image_path, mask_path, model_path='backend/src/iter_1000000.pth', resize=False, gpu_id=0):
+def process_image(image_path, mask_path, model_path='backend/src/iter_1000000.pth', resize=True, gpu_id=0):
     # Define the used device
     device = torch.device(f"cuda:{gpu_id}" if torch.cuda.is_available() else "cpu")
 
@@ -29,9 +29,9 @@ def process_image(image_path, mask_path, model_path='backend/src/iter_1000000.pt
     mask = Image.open(mask_path)
 
     img_transform = transforms.Compose(
-    [transforms.Resize(size=(256,256)), transforms.ToTensor(),
+    [transforms.ToTensor(),
      transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
-    mask_transform = transforms.Compose([transforms.Resize(size=(256,256)), transforms.ToTensor()])
+    mask_transform = transforms.Compose([transforms.ToTensor()])
 
     org = img_transform(org.convert('RGB'))
     mask = mask_transform(mask.convert('RGB'))
@@ -53,8 +53,9 @@ def process_image(image_path, mask_path, model_path='backend/src/iter_1000000.pt
             inp_ = F.interpolate(inp_, size=256)
             mask_ = F.interpolate(mask_, size=256)
         raw_out, _ = model(inp_, mask_)
-        raw_out = F.interpolate(raw_out, size=(500,500))
-        inp = F.interpolate(inp, size=(500,500))
+        if resize:
+            raw_out = F.interpolate(raw_out, size=(500,500))
+
 
     # Post process
     raw_out = raw_out.to(torch.device('cpu')).squeeze()
