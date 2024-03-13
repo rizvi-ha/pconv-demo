@@ -6,6 +6,7 @@ function ImageUploader() {
   const [processedImage, setProcessedImage] = useState('');
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
+  const fileInputRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
 
   useEffect(() => {
@@ -125,6 +126,23 @@ function ImageUploader() {
       })
       .catch(error => console.error('Error:', error));
   };
+
+  const handleReset = () => {
+    // Reset state variables
+    setImage(null);
+    setPreview('');
+    setProcessedImage('');
+
+    // Safely clear the canvas if it exists
+    if (contextRef.current && canvasRef.current) {
+      contextRef.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    }
+
+    // Reset the file input field
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
   
 
   return (
@@ -136,7 +154,7 @@ function ImageUploader() {
         <h1 style={{ margin: 0 }}>PicassoGPT</h1>
       </header>
       <div style={{ position: 'relative', width: '500px', height: '500px', margin: '20px' }}>
-        <input type="file" onChange={handleImageChange} accept="image/*" style={{ zIndex: 2, position: 'absolute' }} />
+        <input type="file" onChange={handleImageChange} accept="image/*" ref={fileInputRef} style={{ zIndex: 2, position: 'absolute' }} />
         {preview && (
           <>
             <img
@@ -161,7 +179,8 @@ function ImageUploader() {
             style={{ maxWidth: '500px', maxHeight: '500px', width: 'auto', height: 'auto', objectFit: 'contain', position: 'absolute', top: '0', left: '0' }}
           />
         )}
-        <button onClick={handleSave} style={{ position: 'absolute', right: 0, zIndex: 3 }}>Save Image & Mask</button>
+        <button onClick={handleSave} style={{ position: 'absolute', right: 0, zIndex: 3 }}>Infill my image!</button>
+        <button onClick={handleReset} style={{ position: 'absolute', right: '140px', zIndex: 3 }}>Reset</button>
       </div>
     </div>
   );
