@@ -1,5 +1,7 @@
 # Partial Convolution Web Demo
 
+![](https://i.imgur.com/rk6r66m.gif)
+
 To try it out, clone and run:
 
 ### `pip install -r requirements.txt`
