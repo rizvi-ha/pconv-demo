@@ -128,33 +128,41 @@ function ImageUploader() {
   
 
   return (
-    <div style={{ position: 'relative', width: '500px', height: '500px', margin: '20px' }}>
-      <input type="file" onChange={handleImageChange} accept="image/*" style={{ zIndex: 2, position: 'absolute' }} />
-      {preview && (
-        <>
+    <div>
+      <header style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+        {/* If your logo is in the public folder, you can reference it like below */}
+        <img src={`${process.env.PUBLIC_URL}/logo.png`} alt="Logo" style={{ height: '150px', marginRight: '10px' }} />
+        
+        <h1 style={{ margin: 0 }}>PicassoGPT</h1>
+      </header>
+      <div style={{ position: 'relative', width: '500px', height: '500px', margin: '20px' }}>
+        <input type="file" onChange={handleImageChange} accept="image/*" style={{ zIndex: 2, position: 'absolute' }} />
+        {preview && (
+          <>
+            <img
+              src={preview}
+              alt="Preview"
+              style={{ maxWidth: '500px', maxHeight: '500px', width: '100%', height: '100%', objectFit: 'contain', position: 'absolute' }}
+            />
+            <canvas
+              ref={canvasRef}
+              onMouseDown={startDrawing}
+              onMouseMove={draw}
+              onMouseUp={stopDrawing}
+              onMouseLeave={stopDrawing}
+              style={{ position: 'absolute', left: '0', top: '0', width: '100%', height: '100%' }}
+            />
+          </>
+        )}
+        {processedImage && (
           <img
-            src={preview}
-            alt="Preview"
-            style={{ maxWidth: '500px', maxHeight: '500px', width: '100%', height: '100%', objectFit: 'contain', position: 'absolute' }}
+            src={`data:image/jpeg;base64,${processedImage}`}
+            alt="Processed"
+            style={{ maxWidth: '500px', maxHeight: '500px', width: 'auto', height: 'auto', objectFit: 'contain', position: 'absolute', top: '0', left: '0' }}
           />
-          <canvas
-            ref={canvasRef}
-            onMouseDown={startDrawing}
-            onMouseMove={draw}
-            onMouseUp={stopDrawing}
-            onMouseLeave={stopDrawing}
-            style={{ position: 'absolute', left: '0', top: '0', width: '100%', height: '100%' }}
-          />
-        </>
-      )}
-      {processedImage && (
-        <img
-          src={`data:image/jpeg;base64,${processedImage}`}
-          alt="Processed"
-          style={{ maxWidth: '500px', maxHeight: '500px', width: 'auto', height: 'auto', objectFit: 'contain', position: 'absolute', top: '0', left: '0' }}
-        />
-      )}
-      <button onClick={handleSave} style={{ position: 'absolute', right: 0, zIndex: 3 }}>Save Image & Mask</button>
+        )}
+        <button onClick={handleSave} style={{ position: 'absolute', right: 0, zIndex: 3 }}>Save Image & Mask</button>
+      </div>
     </div>
   );
 }
