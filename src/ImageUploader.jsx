@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 function ImageUploader() {
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState('');
+  const [processedImage, setProcessedImage] = useState('');
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -104,9 +105,13 @@ function ImageUploader() {
   
     // Convert the canvas to a Blob as JPG
     const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 1.0));
+    const maskImageFile = new File([blob], 'mask-image.jpg', {
+      type: 'image/jpeg',
+      lastModified: Date.now(),
+  });
     const formData = new FormData();
     formData.append('original_image', image);
-    formData.append('mask_image', blob); // Now sending as JPG
+    formData.append('mask_image', maskImageFile); // Now sending as JPG
   
     const url = 'http://127.0.0.1:5001/upload';
   
@@ -114,7 +119,10 @@ function ImageUploader() {
       method: 'POST',
       body: formData,
     }).then(response => response.json())
-      .then(data => console.log(data))
+      .then(data => { 
+        console.log(data); 
+        setProcessedImage(data.encoded_image);
+      })
       .catch(error => console.error('Error:', error));
   };
   
@@ -138,6 +146,13 @@ function ImageUploader() {
             style={{ position: 'absolute', left: '0', top: '0', width: '100%', height: '100%' }}
           />
         </>
+      )}
+      {processedImage && (
+        <img
+          src={`data:image/jpeg;base64,${processedImage}`}
+          alt="Processed"
+          style={{ maxWidth: '500px', maxHeight: '500px', width: 'auto', height: 'auto', objectFit: 'contain', position: 'absolute', top: '0', left: '0' }}
+        />
       )}
       <button onClick={handleSave} style={{ position: 'absolute', right: 0, zIndex: 3 }}>Save Image & Mask</button>
     </div>
