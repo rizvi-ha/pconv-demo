@@ -64,26 +64,45 @@ function ImageUploader() {
     }
   };
 
+  const handleSave = async () => {
+    if (!image) return; // Exit if no image
+  
+    const blob = await new Promise(resolve => canvasRef.current.toBlob(resolve, 'image/png'));
+    const formData = new FormData();
+    formData.append('original_image', image);
+    formData.append('mask_image', blob);
+  
+    const url = 'http://192.168.1.39:5001/upload';
+  
+    fetch(url, {
+      method: 'POST',
+      body: formData,
+    }).then(response => response.json())
+      .then(data => console.log(data))
+      .catch(error => console.error('Error:', error));
+  }; 
+
   return (
-    <div style={{ position: 'relative', width: '500px', height: '500px' }}>
-      <input type="file" onChange={handleImageChange} accept="image/*" style={{ position: 'absolute', zIndex: 2 }} />
+    <div style={{ position: 'relative', width: '500px', height: '500px', margin: '20px' }}>
+      <input type="file" onChange={handleImageChange} accept="image/*" style={{ zIndex: 2, position: 'absolute' }} />
       {preview && (
         <>
           <img
             src={preview}
             alt="Preview"
-            style={{ maxWidth: '500px', maxHeight: '500px', width: '100%', height: '100%', objectFit: 'contain' }}
+            style={{ maxWidth: '500px', maxHeight: '500px', width: '100%', height: '100%', objectFit: 'contain', position: 'absolute' }}
           />
           <canvas
             ref={canvasRef}
-            style={{ position: 'absolute', left: '0', top: '0', pointerEvents: 'auto' }}
             onMouseDown={startDrawing}
             onMouseMove={draw}
             onMouseUp={stopDrawing}
             onMouseLeave={stopDrawing}
+            style={{ position: 'absolute', left: '0', top: '0', width: '100%', height: '100%' }}
           />
         </>
       )}
+      <button onClick={handleSave} style={{ position: 'absolute', right: 0, zIndex: 3 }}>Save Image & Mask</button>
     </div>
   );
 }
