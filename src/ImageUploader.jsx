@@ -58,9 +58,34 @@ function ImageUploader() {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file && file.type.substr(0, 5) === "image") {
-      setImage(file);
+      // Create an image element to load the selected file
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(file);
+      img.onload = () => {
+        // Create a temporary canvas to draw the resized image
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 500;
+        canvas.height = 500;
+  
+        // Draw the image with new dimensions
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  
+        // Convert canvas to blob and update the image state
+        canvas.toBlob((blob) => {
+          const resizedImage = new File([blob], file.name, {
+            type: 'image/png',
+            lastModified: Date.now(),
+          });
+          setImage(resizedImage); // Update state with the resized image
+  
+          // Update preview
+          setPreview(URL.createObjectURL(resizedImage));
+        }, 'image/png');
+      };
     } else {
       setImage(null);
+      setPreview('');
     }
   };
 
@@ -72,7 +97,7 @@ function ImageUploader() {
     formData.append('original_image', image);
     formData.append('mask_image', blob);
   
-    const url = 'http://192.168.1.39:5001/upload';
+    const url = 'http://127.0.0.1:5001/upload';
   
     fetch(url, {
       method: 'POST',
