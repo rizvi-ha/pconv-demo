@@ -92,10 +92,21 @@ function ImageUploader() {
   const handleSave = async () => {
     if (!image) return; // Exit if no image
   
-    const blob = await new Promise(resolve => canvasRef.current.toBlob(resolve, 'image/png'));
+    // Ensure the canvas drawing's transparent parts are filled with black
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width;
+    const h = canvas.height;
+  
+    // Create a new imageData object, filling transparent parts with black
+    let imgData = ctx.getImageData(0, 0, w, h);
+    ctx.putImageData(imgData, 0, 0);
+  
+    // Convert the canvas to a Blob as JPG
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 1.0));
     const formData = new FormData();
     formData.append('original_image', image);
-    formData.append('mask_image', blob);
+    formData.append('mask_image', blob); // Now sending as JPG
   
     const url = 'http://127.0.0.1:5001/upload';
   
@@ -105,7 +116,8 @@ function ImageUploader() {
     }).then(response => response.json())
       .then(data => console.log(data))
       .catch(error => console.error('Error:', error));
-  }; 
+  };
+  
 
   return (
     <div style={{ position: 'relative', width: '500px', height: '500px', margin: '20px' }}>
