@@ -28,7 +28,11 @@ def process_image(image_path, mask_path, model_path='backend/pretrained_pconv.pt
     mask = Image.open(mask_path)
     mask = TF.to_tensor(mask.convert('RGB'))
     mask = 1-mask
-    print((org.shape,mask.shape))
+
+    # Threshold the mask to remove gray pixels
+    threshold = 0.5
+    mask = torch.where(mask > threshold, torch.ones_like(mask), torch.zeros_like(mask))
+
     inp = org * mask
 
     # Model prediction
